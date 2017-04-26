@@ -25,21 +25,18 @@ def trans1():
 
 @app.route('/transactions', methods=['GET'])
 def trans2():
-	# user-ul poate fi sender si receiver
 	user =  request.args.get('user')
 	userInt = int(user)
-	# day se compara cu timestamp
 	day =  request.args.get('day')
 	dayInt = int(day)
-	# threshold se compara cu sum 
 	threshold = request.args.get('threshold')
 	thresholdInt = int(threshold)
 
 	cursor = db.test.find( { 
-			$and : [ 
-				{ $or : [ { sender : { $eq : userInt} }, {receiver : { $eq : userInt} } ] },
-				{timestamp : { $eq : dayInt}},
-				{suma : { $gt : thresholdInt} }
+			 "$and" : [ 
+				{ "$or" : [ { sender : { "$eq" : userInt} }, {receiver : { "$eq" : userInt} } ] },
+				{timestamp : { "$eq" : dayInt}},
+				{suma : { "$gt" : thresholdInt} }
 			]
 		})
 	
@@ -55,19 +52,20 @@ def balance():
 	startInt = int(start)
 	end = request.args.get('until')
 	endInt = int(end)
-	balance = 0	
+	bal = 0	
+	print bal
 	while(startInt <= endInt):
 		cursor = db.test.find({
-			$and : [
-				{ $or : [ { sender : { $eq : userInt} }, {receiver : { $eq : userInt} } ] },
-				{timestamp : { $eq : startInt}},			
+			"$and" : [
+				{ "$or" : [ { sender : { "$eq" : userInt} }, {receiver : { "$eq" : userInt} } ] },
+				{timestamp : { "$eq" : startInt}},			
 			]	
 		})
 		startInt += 1
 		for result in cursor:
 			value = json.load(result)
-			balance += value['suma']
-	print balance		
+			bal += value['suma']
+	print bal		
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", debug=True)
